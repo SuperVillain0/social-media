@@ -63,11 +63,7 @@ exports.sharedProfileData = async function (req, res, next) {
   let postCountPromise = Post.countPostsByAuthor(req.profileUser._id);
   let followerCountPromise = Follow.countFollowersById(req.profileUser._id);
   let followingCountPromise = Follow.countFollowingById(req.profileUser._id);
-  let [postCount, followerCount, followingCount] = await Promise.all([
-    postCountPromise,
-    followerCountPromise,
-    followingCountPromise
-  ]);
+  let [postCount, followerCount, followingCount] = await Promise.all([postCountPromise, followerCountPromise, followingCountPromise]);
 
   req.postCount = postCount;
   req.followerCount = followerCount;
@@ -82,11 +78,9 @@ exports.apiLogin = function (req, res) {
     .login()
     .then(function (result) {
       res.json({
-        token: jwt.sign(
-          { _id: user.data._id, username: user.data.username, avatar: user.avatar },
-          process.env.JWTSECRET,
-          { expiresIn: tokenLasts }
-        ),
+        token: jwt.sign({ _id: user.data._id, username: user.data.username, avatar: user.avatar }, process.env.JWTSECRET, {
+          expiresIn: tokenLasts
+        }),
         username: user.data.username,
         avatar: user.avatar
       });
@@ -102,11 +96,9 @@ exports.apiRegister = function (req, res) {
     .register()
     .then(() => {
       res.json({
-        token: jwt.sign(
-          { _id: user.data._id, username: user.data.username, avatar: user.avatar },
-          process.env.JWTSECRET,
-          { expiresIn: tokenLasts }
-        ),
+        token: jwt.sign({ _id: user.data._id, username: user.data.username, avatar: user.avatar }, process.env.JWTSECRET, {
+          expiresIn: tokenLasts
+        }),
         username: user.data.username,
         avatar: user.avatar
       });
@@ -141,11 +133,7 @@ exports.profileBasicData = function (req, res) {
     profileUsername: req.profileUser.username,
     profileAvatar: req.profileUser.avatar,
     isFollowing: req.isFollowing,
-    counts: {
-      postCount: req.postCount,
-      followerCount: req.followerCount,
-      followingCount: req.followingCount
-    }
+    counts: { postCount: req.postCount, followerCount: req.followerCount, followingCount: req.followingCount }
   });
 };
 

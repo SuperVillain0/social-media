@@ -8,14 +8,14 @@ function HeaderLoggedOut(props) {
   const handleSubmit = async e => {
     e.preventDefault();
     try {
-      const serverRes = await Axios.post("http://localhost:8080/login", {
+      const response = await Axios.post("/login", {
         username,
         password
       });
-      if (serverRes.data) {
-        localStorage.setItem("appToken", serverRes.data.token);
-        localStorage.setItem("appUsername", serverRes.data.username);
-        localStorage.setItem("appAvatar", serverRes.data.avatar);
+      if (response.data) {
+        localStorage.setItem("appToken", response.data.token);
+        localStorage.setItem("appUsername", response.data.username);
+        localStorage.setItem("appAvatar", response.data.avatar);
         props.setLoggedIn(true);
       } else {
         console.log("Incorrect Credentials");

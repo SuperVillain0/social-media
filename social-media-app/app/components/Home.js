@@ -3,7 +3,7 @@ import Page from "./Page";
 
 function Home() {
   return (
-    <Page tile="Your Feed">
+    <Page title="Your Feed">
       <h2 className="text-center">
         Hello <strong>{localStorage.getItem("appUsername")}</strong>, your feed is empty.
       </h2>
