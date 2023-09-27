@@ -1,7 +1,9 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useContext } from "react";
 import Axios from "axios";
+import DispatchContext from "../DispatchContext";
 
-function HeaderLoggedOut(props) {
+function HeaderLoggedOut() {
+  const appDispatch = useContext(DispatchContext);
   const [username, setUsername] = useState();
   const [password, setPassword] = useState();
 
@@ -16,7 +18,7 @@ function HeaderLoggedOut(props) {
         localStorage.setItem("appToken", response.data.token);
         localStorage.setItem("appUsername", response.data.username);
         localStorage.setItem("appAvatar", response.data.avatar);
-        props.setLoggedIn(true);
+        appDispatch({ type: "login" });
       } else {
         console.log("Incorrect Credentials");
       }
