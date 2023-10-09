@@ -1,12 +1,20 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useContext } from "react";
 import Page from "./Page";
+import NotFound from "./NotFound";
 import LoadingDotsIcon from "./LoadingDotsIcon";
-import { useParams, Link } from "react-router-dom";
+import { useParams, Link, useNavigate } from "react-router-dom";
 import Axios from "axios";
 import ReactMarkdown from "react-markdown";
 import { Tooltip } from "react-tooltip";
 
+import StateContext from "../StateContext";
+import DispatchContext from "../DispatchContext";
+
 function ViewSinglePost() {
+  const navigate = useNavigate();
+  const appState = useContext(StateContext);
+  const appDispatch = useContext(DispatchContext);
+
   const { id } = useParams();
   const [isLoading, setIsLoading] = useState(true);
   const [post, setPost] = useState();
@@ -30,6 +38,10 @@ function ViewSinglePost() {
     };
   }, []);
 
+  if (!isLoading && !post) {
+    return <NotFound />;
+  }
+
   if (isLoading)
     return (
       <Page title="...">
@@ -40,20 +52,50 @@ function ViewSinglePost() {
   const date = new Date(post.createdDate);
   const dateFormatted = `${date.getMonth() + 1}/${date.getDate()}/${date.getFullYear()}`;
 
+  const isOwner = () => {
+    if (appState.loggedIn) {
+      return appState.user.username == post.author.username;
+    }
+    return false;
+  };
+
+  const deleteHandler = async () => {
+    const areYouSure = window.confirm("This action cannot be undone.");
+    if (areYouSure) {
+      try {
+        const response = await Axios.delete(`/post/${id}`, { data: { token: appState.user.token } });
+        if (response.data == "Success") {
+          appDispatch({ type: "flashMessage", value: "Post was successfully deleted." });
+          // Redirecting to posts page
+          navigate(`/profile/${appState.user.username}`);
+        }
+      } catch (err) {
+        console.log("There was a prob.");
+      }
+    }
+  };
+
   return (
     <Page title={post.title}>
       <div className="d-flex justify-content-between">
         <h2>{post.title}</h2>
-        <span className="pt-2">
-          <a href="#" data-tooltip-content="Edit" data-tooltip-id="edit" className="text-primary mr-2">
-            <i className="fas fa-edit"></i>
-          </a>
-          <Tooltip id="edit" className="custom-tooltip" />{" "}
-          <a data-tooltip-content="Delete" data-tooltip-id="delete" className="delete-post-button text-danger">
-            <i className="fas fa-trash"></i>
-          </a>
-          <Tooltip id="delete" className="custom-tooltip" />
-        </span>
+        {isOwner() && (
+          <span className="pt-2">
+            <Link to={`/post/${post._id}/edit`} data-tooltip-content="Edit" data-tooltip-id="edit" className="text-primary mr-2">
+              <i className="fas fa-edit"></i>
+            </Link>
+            <Tooltip id="edit" className="custom-tooltip" />{" "}
+            <a
+              onClick={deleteHandler}
+              data-tooltip-content="Delete"
+              data-tooltip-id="delete"
+              className="delete-post-button text-danger"
+            >
+              <i className="fas fa-trash"></i>
+            </a>
+            <Tooltip id="delete" className="custom-tooltip" />
+          </span>
+        )}
       </div>
 
       <p className="text-muted small mb-4">
