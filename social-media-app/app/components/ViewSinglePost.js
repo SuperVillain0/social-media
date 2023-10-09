@@ -36,7 +36,7 @@ function ViewSinglePost() {
     return () => {
       ourRequest.cancel();
     };
-  }, []);
+  }, [id]);
 
   if (!isLoading && !post) {
     return <NotFound />;
@@ -81,7 +81,12 @@ function ViewSinglePost() {
         <h2>{post.title}</h2>
         {isOwner() && (
           <span className="pt-2">
-            <Link to={`/post/${post._id}/edit`} data-tooltip-content="Edit" data-tooltip-id="edit" className="text-primary mr-2">
+            <Link
+              to={`/post/${post._id}/edit`}
+              data-tooltip-content="Edit"
+              data-tooltip-id="edit"
+              className="text-primary mr-2"
+            >
               <i className="fas fa-edit"></i>
             </Link>
             <Tooltip id="edit" className="custom-tooltip" />{" "}
